@@ -1,21 +1,14 @@
 import 'dotenv/config';
 import express from 'express';
 import { triageInputSchema, triageOutputSchema } from './src/llm/schema.js';
+import { complete } from './src/llm/provider.js';
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import OpenAI from "openai";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const client = new OpenAI({
-  baseURL: process.env.LLM_BASE_URL,
-  apiKey: process.env.LLM_API_KEY,
-  timeout: 30000, // Explicit 30s timeout
-  maxRetries: 2,  // Explicit retry policy for 429 and 5xx errors
-});
 
 const app = express();
 app.use(express.json());
@@ -36,32 +29,11 @@ app.post('/triage', async (req, res) => {
     });
   }
 
-  // Check if we are in stub mode
-  if (process.env.LLM_STUB === '1') {
-    return res.json({
-      category: 'bug',
-      urgency: 'high',
-      confidence: 0.95,
-      reason: 'This is a stubbed response for testing without hitting the model API.',
-    });
-  }
+  // Stub mode logic is now handled in provider.js mock implementation
 
   try {
     const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts', 'triage-v1.md'), 'utf-8');
     
-    // Helper to call LLM
-    const callLLM = async (messages) => {
-      const response = await client.chat.completions.create({
-        model: process.env.LLM_MODEL,
-        messages: messages,
-        temperature: 0,
-      });
-      return { 
-        text: response.choices[0].message.content, 
-        usage: response.usage 
-      };
-    };
-
     let messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: JSON.stringify(req.body) }
@@ -70,7 +42,7 @@ app.post('/triage', async (req, res) => {
     const startTime = performance.now();
     let repairCount = 0;
     
-    let llmResult = await callLLM(messages);
+    let llmResult = await complete(messages);
     let rawOutput = llmResult.text;
     
     // Parse helper
@@ -92,7 +64,7 @@ app.post('/triage', async (req, res) => {
       messages.push({ role: "assistant", content: rawOutput });
       messages.push({ role: "user", content: errorMsg });
       
-      llmResult = await callLLM(messages);
+      llmResult = await complete(messages);
       rawOutput = llmResult.text;
       
       try {

@@ -41,11 +41,13 @@ curl.exe -X POST http://localhost:3000/triage ^
 
 ## Configuration & LLM Provider
 
-This project uses **OpenRouter** and the `openrouter/free` model. The integration is abstracted using the official OpenAI SDK. 
+This project uses **OpenRouter** and the `openrouter/free` model. The integration is abstracted behind a generic `complete(prompt, input)` interface (`src/llm/provider.js`). 
 To swap to another provider (like Ollama or OpenAI directly), simply change these three environment variables in `.env`:
 - `LLM_BASE_URL`
 - `LLM_API_KEY`
 - `LLM_MODEL`
+
+**Why abstracting the provider matters:** Unlike standard HTTP APIs that are predictable and stable, LLM providers often suffer outages, change pricing, or deprecate models without warning. Having a single interface to swap providers via environment variables (or even dynamically at runtime) ensures your application doesn't go down when your chosen provider does.
 
 *(A kill switch is also available by setting `LLM_ENABLED=false`)*
 
