@@ -1,0 +1,34 @@
+[
+  {
+    "input": { "text": "I was charged twice for my subscription this month. Please refund me!" },
+    "expected": { "category": "billing", "urgency": "high" }
+  },
+  {
+    "input": { "text": "Can you add a dark mode to the dashboard?" },
+    "expected": { "category": "feature", "urgency": "low" }
+  },
+  {
+    "input": { "text": "The login page is giving a 500 internal server error for everyone in our team." },
+    "expected": { "category": "bug", "urgency": "high" }
+  },
+  {
+    "input": { "text": "How do I invite a new user to my workspace?" },
+    "expected": { "category": "other", "urgency": "low" }
+  },
+  {
+    "input": { "text": "My screen is broken." },
+    "expected": { "category": "other", "urgency": "low" }
+  },
+  {
+    "input": { "text": "Is there a way to export data as CSV instead of PDF?" },
+    "expected": { "category": "feature", "urgency": "normal" }
+  },
+  {
+    "input": { "text": "We need to update our credit card on file before the next billing cycle." },
+    "expected": { "category": "billing", "urgency": "normal" }
+  },
+  {
+    "input": { "text": "The app freezes sometimes when I click the save button too fast." },
+    "expected": { "category": "bug", "urgency": "normal" }
+  }
+]

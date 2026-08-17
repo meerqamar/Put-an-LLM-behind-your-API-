@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { triageInputSchema } from './src/llm/schema.js';
+import { triageInputSchema, triageOutputSchema } from './src/llm/schema.js';
 
 import fs from 'fs';
 import path from 'path';
