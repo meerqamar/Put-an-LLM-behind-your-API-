@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { triageInputSchema, triageOutputSchema } from './src/llm/schema.js';
 import { complete } from './src/llm/provider.js';
+import { encode } from 'gpt-tokenizer';
 
 import fs from 'fs';
 import path from 'path';
@@ -19,6 +20,12 @@ app.post('/triage', async (req, res) => {
   if (!inputValidation.success) {
     const errorMsg = inputValidation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
     return res.status(400).json({ error: `Invalid input - ${errorMsg}` });
+  }
+
+  // Token Limit Check
+  const inputTokensCount = encode(req.body.text).length;
+  if (inputTokensCount > 500) {
+    return res.status(413).json({ error: `Payload Too Large: input text exceeds 500 tokens (got ${inputTokensCount})` });
   }
 
   // Check if LLM is explicitly disabled (Kill Switch)

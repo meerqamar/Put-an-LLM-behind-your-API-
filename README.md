@@ -69,5 +69,7 @@ Example cost log for a single call:
 **Cost Estimate:** 
 Since we use the `openrouter/free` model, our cost is $0. However, if we swapped to `gpt-4o-mini` (roughly $0.15 / 1M input tokens and $0.60 / 1M output tokens), 10,000 requests a day averaging ~650 tokens each would cost approximately **$1.90 per day**.
 
+**Biggest Cost Driver:** Input tokens are by far the biggest driver of cost, because the system prompt and few-shot examples are sent with every single request (and sent again on every retry).
+
 ## What I'd fix with another day
 If I had another day, I would add a prompt-versioned caching layer (Redis) so we never send the exact same support message to the LLM twice, saving both time and API quota.
