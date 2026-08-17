@@ -7,7 +7,8 @@ const __dirname = path.dirname(__filename);
 
 async function runEvals() {
   const cases = JSON.parse(fs.readFileSync(path.join(__dirname, 'cases.json'), 'utf-8'));
-  let passed = 0;
+  let easyPassed = 0, easyTotal = 0;
+  let hardPassed = 0, hardTotal = 0;
   const failed = [];
 
   for (let i = 0; i < cases.length; i++) {
@@ -25,10 +26,15 @@ async function runEvals() {
       
       const result = await res.json();
       
+      if (testCase.difficulty === 'easy') easyTotal++;
+      if (testCase.difficulty === 'hard') hardTotal++;
+
       if (result.category === testCase.expected.category) {
-        passed++;
+        if (testCase.difficulty === 'easy') easyPassed++;
+        if (testCase.difficulty === 'hard') hardPassed++;
       } else {
         failed.push({
+          difficulty: testCase.difficulty,
           case: testCase.input.text,
           expected: testCase.expected.category,
           got: result.category,
@@ -36,14 +42,20 @@ async function runEvals() {
         });
       }
     } catch (e) {
+      if (testCase.difficulty === 'easy') easyTotal++;
+      if (testCase.difficulty === 'hard') hardTotal++;
       failed.push({
+        difficulty: testCase.difficulty,
         case: testCase.input.text,
         error: e.message
       });
     }
   }
 
-  console.log(`\nEval Results: ${passed} out of ${cases.length} matched expected category.`);
+  console.log(`\nEval Results:`);
+  console.log(`Easy: ${easyPassed} out of ${easyTotal} matched`);
+  console.log(`Hard: ${hardPassed} out of ${hardTotal} matched`);
+  console.log(`Total: ${easyPassed + hardPassed} out of ${cases.length} matched expected category.`);
   if (failed.length > 0) {
     console.log('\nFailed Cases:');
     failed.forEach(f => console.log(f));

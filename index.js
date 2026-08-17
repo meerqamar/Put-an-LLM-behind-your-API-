@@ -38,7 +38,7 @@ app.post('/triage', async (req, res) => {
   // Stub mode logic is now handled in provider.js mock implementation
 
   try {
-    const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts', 'triage-v2.md'), 'utf-8');
+    const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts', 'triage-v3.md'), 'utf-8');
     
     let messages = [
       { role: "system", content: systemPrompt },
