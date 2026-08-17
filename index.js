@@ -18,8 +18,7 @@ app.post('/triage', async (req, res) => {
   // Validate input
   const inputValidation = triageInputSchema.safeParse(req.body);
   if (!inputValidation.success) {
-    const errorMsg = inputValidation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
-    return res.status(400).json({ error: `Invalid input - ${errorMsg}` });
+    return res.status(400).json({ error: `Invalid input - ${inputValidation.error.message}` });
   }
 
   // Token Limit Check
@@ -39,11 +38,11 @@ app.post('/triage', async (req, res) => {
   // Stub mode logic is now handled in provider.js mock implementation
 
   try {
-    const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts', 'triage-v1.md'), 'utf-8');
+    const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts', 'triage-v2.md'), 'utf-8');
     
     let messages = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: JSON.stringify(req.body) }
+      { role: "user", content: `<<<INPUT>>>\n${req.body.text}\n<<<END_INPUT>>>` }
     ];
 
     const startTime = performance.now();
